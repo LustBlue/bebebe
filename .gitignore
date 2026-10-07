@@ -42,14 +42,26 @@ env/
 *.db
 *.sqlite
 *.sqlite3
+# Временные базы данных тестов и демонстрационных снимков
+test_db_*.sqlite*
+screenshots_demo_*.sqlite*
+projectflow.db-shm
+projectflow.db-wal
 
 # Logs
 *.log
 
 # Test coverage
 .coverage
+coverage.xml
 htmlcov/
 .pytest_cache/
+
+# Промежуточные материалы проверок (формируются заново инструментами)
+reports/report_preview.pdf
+reports/preview_pages/
+reports/pages*/
+reports/inspection_before.json
 
 # OS
 .DS_Store

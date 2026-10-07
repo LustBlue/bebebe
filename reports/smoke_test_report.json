@@ -1,0 +1,132 @@
+{
+  "base_url": "http://127.0.0.1:5099",
+  "passed": 25,
+  "total": 25,
+  "checks": [
+    {
+      "check": "GET /api/health отвечает 200",
+      "passed": true,
+      "detail": "код 200"
+    },
+    {
+      "check": "Сервис сообщает статус ok",
+      "passed": true,
+      "detail": "1.0.0"
+    },
+    {
+      "check": "Зарегистрированы все три модуля",
+      "passed": true,
+      "detail": "auth, tasks, reports"
+    },
+    {
+      "check": "Вход пользователя admin",
+      "passed": true,
+      "detail": "код 200"
+    },
+    {
+      "check": "Вход пользователя manager",
+      "passed": true,
+      "detail": "код 200"
+    },
+    {
+      "check": "Вход пользователя executor",
+      "passed": true,
+      "detail": "код 200"
+    },
+    {
+      "check": "Модуль задач требует авторизации",
+      "passed": true,
+      "detail": "код 401"
+    },
+    {
+      "check": "Подделанный токен отклоняется",
+      "passed": true,
+      "detail": "код 401"
+    },
+    {
+      "check": "Токен принимается модулем авторизации",
+      "passed": true,
+      "detail": "код 200"
+    },
+    {
+      "check": "Создание задачи",
+      "passed": true,
+      "detail": "код 201, статус 'new'"
+    },
+    {
+      "check": "Переход «новая → в работе»",
+      "passed": true,
+      "detail": "код 200"
+    },
+    {
+      "check": "Переход «в работе → на проверке»",
+      "passed": true,
+      "detail": "код 200"
+    },
+    {
+      "check": "Запрещённый переход отклонён (роль исполнителя)",
+      "passed": true,
+      "detail": "код 403"
+    },
+    {
+      "check": "Переход «на проверке → завершена» (менеджер)",
+      "passed": true,
+      "detail": "код 200"
+    },
+    {
+      "check": "Запрещённый переход «завершена → новая» отклонён",
+      "passed": true,
+      "detail": "Невозможно перейти из статуса 'completed' в 'new'"
+    },
+    {
+      "check": "История изменений задачи ведётся",
+      "passed": true,
+      "detail": "записей: 4"
+    },
+    {
+      "check": "Отчёт по исполнителю сформирован",
+      "passed": true,
+      "detail": "задач: 1"
+    },
+    {
+      "check": "Отчёт по проекту сформирован",
+      "passed": true,
+      "detail": "задач: 1"
+    },
+    {
+      "check": "Отчёт за период сформирован",
+      "passed": true,
+      "detail": "задач: 1"
+    },
+    {
+      "check": "Отчёты регистрируются в базе данных",
+      "passed": true,
+      "detail": "записей: 3"
+    },
+    {
+      "check": "Экспорт отчёта в PDF",
+      "passed": true,
+      "detail": "reports\\report_20261007_143642_005132.pdf"
+    },
+    {
+      "check": "Экспорт отчёта в Excel",
+      "passed": true,
+      "detail": "reports\\report_20261007_143642.xlsx"
+    },
+    {
+      "check": "Неизвестный маршрут возвращает 404",
+      "passed": true,
+      "detail": "код 404"
+    },
+    {
+      "check": "Некорректные данные возвращают 400",
+      "passed": true,
+      "detail": "код 400"
+    },
+    {
+      "check": "Список задач фильтруется по проекту",
+      "passed": true,
+      "detail": "задач: 1"
+    }
+  ]
+}

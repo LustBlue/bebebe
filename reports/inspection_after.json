@@ -1,0 +1,176 @@
+{
+  "files_checked": 31,
+  "lines_checked": 7326,
+  "total_findings": 20,
+  "by_rule": {
+    "C901": 10,
+    "D103": 5,
+    "N802": 5
+  },
+  "by_severity": {
+    "medium": 15,
+    "high": 5
+  },
+  "findings": [
+    {
+      "rule": "C901",
+      "path": "src/api.py",
+      "line": 160,
+      "message": "Цикломатическая сложность функции 'register_routes' = 22 (норма — не более 12)",
+      "severity": "medium",
+      "symbol": "register_routes"
+    },
+    {
+      "rule": "D103",
+      "path": "src/core/auth_deps.py",
+      "line": 61,
+      "message": "Отсутствует docstring функции 'dependency'",
+      "severity": "high",
+      "symbol": "dependency"
+    },
+    {
+      "rule": "C901",
+      "path": "src/core/http_core.py",
+      "line": 156,
+      "message": "Цикломатическая сложность функции '_make_handler' = 21 (норма — не более 12)",
+      "severity": "medium",
+      "symbol": "_make_handler"
+    },
+    {
+      "rule": "D103",
+      "path": "src/core/http_core.py",
+      "line": 108,
+      "message": "Отсутствует docstring функции 'decorator'",
+      "severity": "high",
+      "symbol": "decorator"
+    },
+    {
+      "rule": "N802",
+      "path": "src/core/http_core.py",
+      "line": 255,
+      "message": "Имя функции 'do_GET' не соответствует snake_case",
+      "severity": "medium",
+      "symbol": "do_GET"
+    },
+    {
+      "rule": "N802",
+      "path": "src/core/http_core.py",
+      "line": 259,
+      "message": "Имя функции 'do_POST' не соответствует snake_case",
+      "severity": "medium",
+      "symbol": "do_POST"
+    },
+    {
+      "rule": "N802",
+      "path": "src/core/http_core.py",
+      "line": 263,
+      "message": "Имя функции 'do_PUT' не соответствует snake_case",
+      "severity": "medium",
+      "symbol": "do_PUT"
+    },
+    {
+      "rule": "N802",
+      "path": "src/core/http_core.py",
+      "line": 267,
+      "message": "Имя функции 'do_PATCH' не соответствует snake_case",
+      "severity": "medium",
+      "symbol": "do_PATCH"
+    },
+    {
+      "rule": "N802",
+      "path": "src/core/http_core.py",
+      "line": 271,
+      "message": "Имя функции 'do_DELETE' не соответствует snake_case",
+      "severity": "medium",
+      "symbol": "do_DELETE"
+    },
+    {
+      "rule": "C901",
+      "path": "src/report_module/__init__.py",
+      "line": 343,
+      "message": "Цикломатическая сложность функции 'export_report_to_pdf' = 24 (норма — не более 12)",
+      "severity": "medium",
+      "symbol": "export_report_to_pdf"
+    },
+    {
+      "rule": "C901",
+      "path": "src/task_module/__init__.py",
+      "line": 207,
+      "message": "Цикломатическая сложность функции 'update_task' = 16 (норма — не более 12)",
+      "severity": "medium",
+      "symbol": "update_task"
+    },
+    {
+      "rule": "C901",
+      "path": "tools/inspect_code.py",
+      "line": 257,
+      "message": "Цикломатическая сложность функции 'inspect_file' = 77 (норма — не более 12)",
+      "severity": "medium",
+      "symbol": "inspect_file"
+    },
+    {
+      "rule": "C901",
+      "path": "tools/inspect_code.py",
+      "line": 575,
+      "message": "Цикломатическая сложность функции 'main' = 15 (норма — не более 12)",
+      "severity": "medium",
+      "symbol": "main"
+    },
+    {
+      "rule": "D103",
+      "path": "tools/pytest_stub.py",
+      "line": 117,
+      "message": "Отсутствует docstring функции 'decorate'",
+      "severity": "high",
+      "symbol": "decorate"
+    },
+    {
+      "rule": "D103",
+      "path": "tools/pytest_stub.py",
+      "line": 156,
+      "message": "Отсутствует docstring функции 'decorate'",
+      "severity": "high",
+      "symbol": "decorate"
+    },
+    {
+      "rule": "C901",
+      "path": "tools/run_tests.py",
+      "line": 188,
+      "message": "Цикломатическая сложность функции 'main' = 15 (норма — не более 12)",
+      "severity": "medium",
+      "symbol": "main"
+    },
+    {
+      "rule": "C901",
+      "path": "tools/smoke_test.py",
+      "line": 72,
+      "message": "Цикломатическая сложность функции 'main' = 30 (норма — не более 12)",
+      "severity": "medium",
+      "symbol": "main"
+    },
+    {
+      "rule": "C901",
+      "path": "tools/verify_pdf.py",
+      "line": 67,
+      "message": "Цикломатическая сложность функции 'verify' = 19 (норма — не более 12)",
+      "severity": "medium",
+      "symbol": "verify"
+    },
+    {
+      "rule": "C901",
+      "path": "tools/verify_pdf.py",
+      "line": 175,
+      "message": "Цикломатическая сложность функции 'main' = 13 (норма — не более 12)",
+      "severity": "medium",
+      "symbol": "main"
+    },
+    {
+      "rule": "D103",
+      "path": "tools/verify_pdf.py",
+      "line": 82,
+      "message": "Отсутствует docstring функции 'check'",
+      "severity": "high",
+      "symbol": "check"
+    }
+  ]
+}
