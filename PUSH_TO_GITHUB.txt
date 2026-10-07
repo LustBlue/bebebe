@@ -1,0 +1,20 @@
+﻿# Команды для отправки проекта ProjectFlow на GitHub
+# Дата: 2026-10-07
+
+# Шаг 1: Перейти в директорию проекта
+cd "C:\Users\Arnew\OneDrive\Документы\deepseek-harness\default-workspace\ProjectFlow"
+
+# Шаг 2: Отправить основную ветку
+git push -u origin main
+
+# Шаг 3: Отправить ветку разработки
+git push -u origin develop
+
+# Шаг 4: Отправить все feature ветки
+git push --all origin
+
+# Шаг 5: Отправить все теги (если есть)
+git push --tags origin
+
+# Проверка результата
+# Откройте в браузере: https://github.com/LustBlue/bebebe
