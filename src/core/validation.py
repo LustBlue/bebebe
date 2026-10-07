@@ -45,15 +45,10 @@ def validate_username(value: Any) -> str:
 
 
 def validate_email(value: Any) -> str:
-    """Проверить адрес электронной почты.
-
-    :raises ValidationError: если адрес пуст или не соответствует шаблону
-    """
+    """Проверить адрес электронной почты."""
     text = str(value or "").strip().lower()
     if not EMAIL_RE.match(text):
-        raise ValidationError(
-            "Некорректный email: адрес должен иметь вид user@example.com"
-        )
+        raise ValidationError("Некорректный адрес электронной почты")
     return text
 
 

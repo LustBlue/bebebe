@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import Any
 
 from .errors import ConflictError, NotFoundError
-from .repository import fetch_all, fetch_one, insert, update
+from .repository import execute, fetch_all, fetch_one, insert, update
 
 
 def get_by_id(user_id: int) -> dict[str, Any] | None:

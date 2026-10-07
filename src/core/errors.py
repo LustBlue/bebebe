@@ -68,13 +68,3 @@ class InvalidTransitionError(ConflictError):
     """Запрещённый переход статуса задачи."""
 
     code = "invalid_transition"
-
-
-#: Псевдоним :class:`PermissionDeniedError`.
-#:
-#: Модули приложения исторически импортируют это исключение как
-#: ``PermissionError``. Встроенное исключение Python с тем же именем
-#: относится к файловой системе, поэтому в прикладном коде используется
-#: доменное имя ``PermissionDeniedError``, а псевдоним сохраняется для
-#: обратной совместимости с внешними тестами.
-PermissionError = PermissionDeniedError  # noqa: A001 - намеренное затенение
