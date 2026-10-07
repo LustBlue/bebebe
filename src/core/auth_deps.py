@@ -10,7 +10,7 @@ import json
 from typing import Any, Callable
 
 from .errors import AuthenticationError, PermissionDeniedError
-from .http_core import Request, Response
+from .http_core import Request
 from .models import UserRole
 from .repository import fetch_one
 from .security import decode_access_token
