@@ -212,8 +212,10 @@ def _count_tests() -> tuple[int, dict[str, int]]:
 
 
 def _count_lines() -> tuple[int, int, int]:
-    """Подсчитать строки исходного кода, тестов и документации."""
+    """Подсчитать строки исходного кода, тестов и инструментальных средств."""
+
     def count(directory: Path) -> int:
+        """Вернуть суммарное число строк во всех модулях каталога."""
         return sum(len(p.read_text(encoding="utf-8").splitlines())
                    for p in directory.rglob("*.py") if "__pycache__" not in p.parts)
 
@@ -353,6 +355,36 @@ def diary(report: DocxReport) -> None:
         widths=[0.5, 1.2, 8.0, 1.2],
         font_size=10,
     )
+
+
+def _inspection_stats() -> dict[str, object]:
+    """Выполнить статический анализ кода для раздела об инспектировании.
+
+    Числа в отчёте не задаются вручную: они вычисляются тем же
+    анализатором, что применяется при проверке (``tools/inspect_code.py``),
+    поэтому отчёт всегда соответствует фактическому состоянию кода.
+
+    :return: словарь с общим числом замечаний, распределением по правилам
+        и числом согласованных отступлений
+    """
+    from tools.inspect_code import inspect as run_inspection
+
+    result = run_inspection([ROOT / "src", ROOT / "tools", ROOT / "tests"])
+    by_rule = result.by_rule()
+    accepted = result.accepted_findings()
+    accepted_by_rule: dict[str, int] = {}
+    for finding in accepted:
+        accepted_by_rule[finding.rule] = accepted_by_rule.get(finding.rule, 0) + 1
+
+    return {
+        "total": len(result.findings),
+        "open": len(result.open_findings()),
+        "accepted": len(accepted),
+        "files": result.files_checked,
+        "lines": result.lines_checked,
+        "by_rule": by_rule,
+        "accepted_by_rule": accepted_by_rule,
+    }
 
 
 def section_technology(report: DocxReport, stats: dict[str, int]) -> None:
@@ -604,33 +636,41 @@ def section_technology(report: DocxReport, stats: dict[str, int]) -> None:
         "неиспользуемые импорты; цикломатическая сложность функций; "
         "отсутствие секретов в коде."
     )
+    inspection = _inspection_stats()
     report.add_paragraph(
-        "Первый прогон анализа выявил 98 замечаний, из которых устранено 78: "
-        "удалены завершающие пробелы (370 вхождений), устранены неиспользуемые "
-        "импорты, сокращены длинные строки, добавлены docstring-комментарии, "
-        "добавлено связывание исключений при перевыбросе. Оставшиеся "
-        "20 замечаний отнесены к согласованным отступлениям и снабжены "
-        "обоснованиями: имена методов do_GET, do_POST и других заданы "
-        "протоколом BaseHTTPRequestHandler, а превышение порогов сложности "
-        "касается линейных функций инструментальных средств. Неустранённых "
-        "замечаний высокой критичности нет."
+        f"Первый прогон анализа выявил 98 замечаний, к завершению практики "
+        f"их число сократилось до {inspection['total']}: устранены "
+        f"неиспользуемые импорты, завершающие пробелы (370 вхождений), "
+        f"длинные строки, добавлены отсутствующие docstring-комментарии, "
+        f"добавлено связывание исключений при перевыбросе. Оставшиеся "
+        f"{inspection['accepted']} замечаний отнесены к согласованным "
+        f"отступлениям и снабжены обоснованиями: имена методов do_GET, "
+        f"do_POST и других заданы протоколом BaseHTTPRequestHandler, а "
+        f"превышение порогов сложности касается линейных функций "
+        f"инструментальных средств. Неустранённых замечаний высокой "
+        f"критичности нет (текущее значение — {inspection['open']})."
     )
     report.add_table(
-        ["Правило", "Смысл правила", "Выявлено", "Устранено", "Осталось"],
+        ["Правило", "Смысл правила", "Выявлено", "Устранено", "Принято"],
         [
             ("W291", "Пробелы в конце строки", "22", "22", "0"),
             ("W292", "Нет перевода строки в конце файла", "31", "31", "0"),
             ("E501", "Превышение длины строки", "8", "8", "0"),
             ("F401", "Неиспользуемый импорт", "21", "21", "0"),
-            ("D103", "Отсутствует docstring функции", "31", "26", "5"),
+            ("D103", "Отсутствует docstring функции", "31",
+             str(31 - int(inspection["by_rule"].get("D103", 0))),
+             str(inspection["by_rule"].get("D103", 0))),
             ("N802", "Именование не в snake_case", "5", "0", "5"),
             ("W0707", "Перевыброс без raise ... from", "1", "1", "0"),
-            ("C901", "Высокая цикломатическая сложность", "10", "0", "10"),
+            ("C901", "Высокая цикломатическая сложность", "10",
+             str(max(0, 10 - int(inspection["by_rule"].get("C901", 0)))),
+             str(inspection["by_rule"].get("C901", 0))),
         ],
         caption="Результаты инспектирования исходного кода",
         widths=[1.2, 4.6, 1.4, 1.4, 1.4],
     )
     report.add_paragraph(
+        f"Проверено файлов: {inspection['files']}, строк: {inspection['lines']}. "
         "Полный отчёт об инспектировании с таблицей замечаний, указанием мест "
         "их возникновения и описанием устранения приведён в приложении Г. "
         "Инспектирование на соответствие математической модели описано в "
@@ -1107,9 +1147,24 @@ def appendix_c_tests(report: DocxReport, stats: dict[str, int]) -> None:
 
 
 def appendix_d_inspection(report: DocxReport) -> None:
-    """Приложение Г: отчёты об инспектировании."""
+    """Приложение Г: отчёты об инспектировании.
+
+    Отчёт об инспектировании кода формируется анализатором непосредственно
+    перед сборкой отчёта, поэтому приведённые в нём числа соответствуют
+    текущему состоянию проекта.
+    """
     report.add_heading("ПРИЛОЖЕНИЕ Г. ОТЧЁТЫ ОБ ИНСПЕКТИРОВАНИИ", level=1,
                        page_break=True)
+
+    # Актуализируем отчёт об инспектировании кода
+    from tools.inspect_code import build_report as build_inspection_report
+    from tools.inspect_code import inspect as run_inspection
+
+    inspection = run_inspection([ROOT / "src", ROOT / "tools", ROOT / "tests"])
+    (ROOT / "docs" / "code_inspection.md").write_text(
+        build_inspection_report(inspection), encoding="utf-8"
+    )
+
     for name, title in (
         ("code_inspection.md", "Отчёт об инспектировании исходного кода"),
         ("report_inspection_docx.md", "Отчёты об инспектировании компонентов"),

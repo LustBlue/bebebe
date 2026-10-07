@@ -326,6 +326,7 @@ def render_png(svg_text: str, target: Path) -> Path:
     draw = ImageDraw.Draw(image)
 
     def sx(value: float) -> float:
+        """Перевести координату SVG в пиксели изображения."""
         return value * SCALE
 
     # --- Прямоугольники -------------------------------------------------

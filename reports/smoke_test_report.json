@@ -1,5 +1,5 @@
 {
-  "base_url": "http://127.0.0.1:5099",
+  "base_url": "http://127.0.0.1:5111",
   "passed": 25,
   "total": 25,
   "checks": [
@@ -86,32 +86,32 @@
     {
       "check": "Отчёт по исполнителю сформирован",
       "passed": true,
-      "detail": "задач: 1"
+      "detail": "задач: 2"
     },
     {
       "check": "Отчёт по проекту сформирован",
       "passed": true,
-      "detail": "задач: 1"
+      "detail": "задач: 2"
     },
     {
       "check": "Отчёт за период сформирован",
       "passed": true,
-      "detail": "задач: 1"
+      "detail": "задач: 2"
     },
     {
       "check": "Отчёты регистрируются в базе данных",
       "passed": true,
-      "detail": "записей: 3"
+      "detail": "записей: 6"
     },
     {
       "check": "Экспорт отчёта в PDF",
       "passed": true,
-      "detail": "reports\\report_20261007_143642_005132.pdf"
+      "detail": "reports\\report_20261007_153009_429761.pdf"
     },
     {
       "check": "Экспорт отчёта в Excel",
       "passed": true,
-      "detail": "reports\\report_20261007_143642.xlsx"
+      "detail": "reports\\report_20261007_153009.xlsx"
     },
     {
       "check": "Неизвестный маршрут возвращает 404",
@@ -126,7 +126,7 @@
     {
       "check": "Список задач фильтруется по проекту",
       "passed": true,
-      "detail": "задач: 1"
+      "detail": "задач: 2"
     }
   ]
 }

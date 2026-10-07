@@ -89,7 +89,8 @@ STEPS: list[dict[str, object]] = [
     },
     {
         "branch": "feature/integration-api",
-        "message": "feat(server): перевести приложение на стандартную библиотеку и добавить точки входа",
+        "message": "feat(server): перевести приложение на стандартную библиотеку, "
+                   "добавить точки входа",
         "paths": [
             "src/core/http_core.py", "src/core/auth_deps.py", "src/main.py",
             "src/__main__.py", "run.py", "static/index.html",
@@ -116,7 +117,8 @@ STEPS: list[dict[str, object]] = [
     },
     {
         "branch": "feature/code-inspection",
-        "message": "chore(tools): реализовать статический анализатор кода по правилам flake8 и pylint",
+        "message": "chore(tools): реализовать статический анализатор кода "
+                   "по правилам flake8 и pylint",
         "paths": ["tools/inspect_code.py", ".flake8", ".pylintrc"],
     },
     {
@@ -154,7 +156,8 @@ STEPS: list[dict[str, object]] = [
     },
     {
         "branch": "feature/report-docs",
-        "message": "chore(tools): добавить построитель документов Word и формирование снимков экрана",
+        "message": "chore(tools): добавить построитель документов Word "
+                   "и формирование снимков экрана",
         "paths": [
             "tools/docx_builder.py", "tools/md_to_docx.py", "tools/html_shot.py",
             "tools/make_screenshots.py",
