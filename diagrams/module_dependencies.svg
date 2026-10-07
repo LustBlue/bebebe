@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="720" viewBox="0 0 1000 720">
+<rect width="1000" height="720" fill="#ffffff"/>
+<text x="500" y="34" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600" fill="#202124">Граф зависимостей модулей системы ProjectFlow</text>
+<line x1="432.0" y1="162.7" x2="249.0" y2="277.3" stroke="#3c4043" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="327.0" y="232.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#3c4043">вызовы AuthModule</text>
+<line x1="500.0" y1="165.0" x2="500.0" y2="275.0" stroke="#3c4043" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="500.0" y="232.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#3c4043">вызовы TaskModule</text>
+<line x1="568.0" y1="162.7" x2="751.0" y2="277.3" stroke="#3c4043" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="673.0" y="232.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#3c4043">вызовы ReportModule</text>
+<line x1="257.5" y1="382.5" x2="407.5" y2="467.5" stroke="#3c4043" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="285.0" y="432.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#3c4043">get_connection / security</text>
+<line x1="500.0" y1="385.0" x2="500.0" y2="465.0" stroke="#3c4043" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="520.0" y="432.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#3c4043">models (диаграмма состояний)</text>
+<line x1="742.5" y1="382.5" x2="592.5" y2="467.5" stroke="#3c4043" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="700.0" y="432.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#3c4043">reports ← tasks</text>
+<line x1="630.0" y1="330.0" x2="705.0" y2="330.0" stroke="#3c4043" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="667.0" y="252.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#3c4043">task_history → данные для отчётов</text>
+<rect x="220.0" y="80.0" width="560.0" height="80.0" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.6"/>
+<text x="500.0" y="101.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="600" fill="#202124">Слой интеграции (src/api.py + src/core/http_core.py)</text>
+<text x="500.0" y="120.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" fill="#3c4043">REST-маршрутизация · единая точка аутентификации (JWT) ·</text>
+<text x="500.0" y="135.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" fill="#3c4043">единый формат ответов и ошибок</text>
+<rect x="40.0" y="280.0" width="250.0" height="100.0" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.6"/>
+<text x="165.0" y="301.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="600" fill="#202124">AuthModule</text>
+<text x="165.0" y="320.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" fill="#3c4043">src/auth_module</text>
+<text x="165.0" y="335.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" fill="#3c4043">регистрация, вход, восстановление</text>
+<text x="165.0" y="350.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" fill="#3c4043">пароля, роли, выдача JWT</text>
+<rect x="375.0" y="280.0" width="250.0" height="100.0" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.6"/>
+<text x="500.0" y="301.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="600" fill="#202124">TaskModule</text>
+<text x="500.0" y="320.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" fill="#3c4043">src/task_module</text>
+<text x="500.0" y="335.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" fill="#3c4043">CRUD проектов и задач, назначение</text>
+<text x="500.0" y="350.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" fill="#3c4043">исполнителей, диаграмма состояний</text>
+<rect x="710.0" y="280.0" width="250.0" height="100.0" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.6"/>
+<text x="835.0" y="301.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="600" fill="#202124">ReportModule</text>
+<text x="835.0" y="320.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" fill="#3c4043">src/report_module</text>
+<text x="835.0" y="335.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" fill="#3c4043">отчёты по исполнителю, проекту,</text>
+<text x="835.0" y="350.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" fill="#3c4043">периоду; экспорт в PDF и Excel</text>
+<rect x="220.0" y="470.0" width="560.0" height="100.0" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.6"/>
+<text x="500.0" y="491.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="600" fill="#202124">Общее ядро (src/core)</text>
+<text x="500.0" y="510.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" fill="#3c4043">config · database (общая БД SQLite: users, projects, tasks,</text>
+<text x="500.0" y="525.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" fill="#3c4043">reports, task_history) · models (диаграмма состояний) ·</text>
+<text x="500.0" y="540.0" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" fill="#3c4043">security (PBKDF2 + JWT HS256) · errors · validation</text>
+<text x="30" y="658" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#202124">Сплошная стрелка — направление передачи управления и данных; все модули используют единое хранилище и единый механизм аутентификации.</text>
+<text x="30" y="676" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#202124">Прямых вызовов между AuthModule и TaskModule нет: взаимодействие выполняется через слой интеграции.</text>
+<text x="500" y="708" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10.5" fill="#5f6368">Зависимости соответствуют структуре пакетов проекта</text>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#3c4043"/></marker>
+<marker id="arrow-open" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10" fill="none" stroke="#3c4043" stroke-width="1.6"/></marker>
+</defs>
+</svg>

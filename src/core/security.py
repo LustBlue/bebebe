@@ -10,18 +10,18 @@ import hashlib
 import hmac
 import secrets
 import time
-from datetime import datetime, timedelta
 from typing import Any
 
 from .config import settings
+from .errors import AuthenticationError
 
 
 def hash_password(password: str) -> str:
     """Хешировать пароль с использованием PBKDF2.
-    
+
     Args:
         password: Пароль для хеширования
-        
+
     Returns:
         Хешированный пароль в формате: salt$hash
     """
@@ -37,11 +37,11 @@ def hash_password(password: str) -> str:
 
 def verify_password(password: str, password_hash: str) -> bool:
     """Проверить пароль против хеша.
-    
+
     Args:
         password: Пароль для проверки
         password_hash: Хеш пароля из базы данных
-        
+
     Returns:
         True если пароль верный, иначе False
     """
@@ -60,11 +60,11 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 def create_access_token(user_id: int, role: str) -> str:
     """Создать JWT access токен.
-    
+
     Args:
         user_id: ID пользователя
         role: Роль пользователя
-        
+
     Returns:
         JWT токен
     """
@@ -80,10 +80,10 @@ def create_access_token(user_id: int, role: str) -> str:
 
 def create_refresh_token(user_id: int) -> str:
     """Создать JWT refresh токен.
-    
+
     Args:
         user_id: ID пользователя
-        
+
     Returns:
         JWT refresh токен
     """
@@ -98,44 +98,77 @@ def create_refresh_token(user_id: int) -> str:
 
 def decode_token(token: str) -> dict[str, Any] | None:
     """Декодировать и валидировать JWT токен.
-    
+
     Args:
         token: JWT токен
-        
+
     Returns:
         Payload токена или None если токен невалиден
     """
     try:
         payload = _decode_jwt(token)
-        
+
         # Проверяем срок действия
         if payload.get('exp', 0) < time.time():
             return None
-        
+
         return payload
     except Exception:
         return None
 
 
+def decode_access_token(token: str) -> dict[str, Any]:
+    """Декодировать access-токен и вернуть его полезную нагрузку.
+
+    Используется зависимостями аутентификации :mod:`src.core.auth_deps`
+    как единая точка проверки токена для всех модулей системы.
+
+    :param token: JWT, выданный функцией :func:`create_access_token`
+    :raises AuthenticationError: если токен отсутствует, повреждён, просрочен
+        или имеет тип, отличный от ``access``
+    """
+    payload = decode_token(token)
+    if payload is None:
+        raise AuthenticationError("Недействительный или просроченный токен")
+    if payload.get("type") != "access":
+        raise AuthenticationError("Требуется access-токен")
+    if not payload.get("user_id"):
+        raise AuthenticationError("Токен не содержит идентификатор пользователя")
+    return payload
+
+
+def decode_refresh_token(token: str) -> dict[str, Any]:
+    """Декодировать refresh-токен и вернуть его полезную нагрузку.
+
+    :raises AuthenticationError: если токен недействителен или имеет другой тип
+    """
+    payload = decode_token(token)
+    if payload is None:
+        raise AuthenticationError("Недействительный или просроченный токен")
+    if payload.get("type") != "refresh":
+        raise AuthenticationError("Требуется refresh-токен")
+    return payload
+
+
 def _encode_jwt(payload: dict[str, Any]) -> str:
     """Простая реализация JWT encoding (для учебных целей).
-    
+
     В production лучше использовать библиотеку PyJWT.
     """
     import base64
     import json
-    
+
     # Header
     header = {'alg': settings.jwt_algorithm, 'typ': 'JWT'}
     header_encoded = base64.urlsafe_b64encode(
         json.dumps(header).encode()
     ).decode().rstrip('=')
-    
+
     # Payload
     payload_encoded = base64.urlsafe_b64encode(
         json.dumps(payload).encode()
     ).decode().rstrip('=')
-    
+
     # Signature
     message = f"{header_encoded}.{payload_encoded}"
     signature = hmac.new(
@@ -144,7 +177,7 @@ def _encode_jwt(payload: dict[str, Any]) -> str:
         hashlib.sha256
     ).digest()
     signature_encoded = base64.urlsafe_b64encode(signature).decode().rstrip('=')
-    
+
     return f"{message}.{signature_encoded}"
 
 
@@ -152,13 +185,13 @@ def _decode_jwt(token: str) -> dict[str, Any]:
     """Простая реализация JWT decoding (для учебных целей)."""
     import base64
     import json
-    
+
     parts = token.split('.')
     if len(parts) != 3:
         raise ValueError("Invalid token format")
-    
+
     header_encoded, payload_encoded, signature_encoded = parts
-    
+
     # Проверяем подпись
     message = f"{header_encoded}.{payload_encoded}"
     expected_signature = hmac.new(
@@ -166,24 +199,24 @@ def _decode_jwt(token: str) -> dict[str, Any]:
         message.encode(),
         hashlib.sha256
     ).digest()
-    
+
     # Добавляем padding если нужно
     signature_encoded += '=' * (4 - len(signature_encoded) % 4)
     signature = base64.urlsafe_b64decode(signature_encoded)
-    
+
     if not hmac.compare_digest(signature, expected_signature):
         raise ValueError("Invalid signature")
-    
+
     # Декодируем payload
     payload_encoded += '=' * (4 - len(payload_encoded) % 4)
     payload = json.loads(base64.urlsafe_b64decode(payload_encoded))
-    
+
     return payload
 
 
 def generate_reset_token() -> str:
     """Генерировать токен для сброса пароля.
-    
+
     Returns:
         Случайный токен
     """
@@ -192,23 +225,23 @@ def generate_reset_token() -> str:
 
 def is_password_strong(password: str) -> tuple[bool, str]:
     """Проверить надёжность пароля.
-    
+
     Args:
         password: Пароль для проверки
-        
+
     Returns:
         Кортеж (валиден, сообщение об ошибке)
     """
     if len(password) < settings.password_min_length:
         return False, f"Пароль должен содержать минимум {settings.password_min_length} символов"
-    
+
     if not any(c.isupper() for c in password):
         return False, "Пароль должен содержать хотя бы одну заглавную букву"
-    
+
     if not any(c.islower() for c in password):
         return False, "Пароль должен содержать хотя бы одну строчную букву"
-    
+
     if not any(c.isdigit() for c in password):
         return False, "Пароль должен содержать хотя бы одну цифру"
-    
+
     return True, ""

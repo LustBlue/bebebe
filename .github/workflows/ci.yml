@@ -1,111 +1,256 @@
-name: CI/CD Pipeline
+name: CI
 
+# Конвейер непрерывной интеграции ProjectFlow.
+# Запускается при push и pull request в основные ветви проекта.
+# Проверяет: статический анализ, автоматические тесты (модульные,
+# интеграционные, системные), инспектирование на соответствие модели,
+# вёрстку диаграмм, формирование и проверку отчётных документов,
+# а также анализ безопасности.
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop, 'feature/**', 'docs/**']
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
+  workflow_dispatch:
+
+# Минимально необходимые права: конвейер только читает репозиторий.
+permissions:
+  contents: read
+
+env:
+  PYTHONIOENCODING: utf-8
+  PYTHONUTF8: '1'
 
 jobs:
-  test:
+  # ------------------------------------------------------------------
+  # 1. Статический анализ и инспектирование кода
+  # ------------------------------------------------------------------
+  lint:
+    name: Статический анализ кода
     runs-on: ubuntu-latest
-    
+    steps:
+      - name: Получение исходного кода
+        uses: actions/checkout@v4
+
+      - name: Установка Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Встроенный анализатор (правила flake8/pylint)
+        run: python tools/inspect_code.py --target src tools tests --report reports/inspection_ci.md
+
+      - name: Внешние анализаторы (flake8, pylint)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install flake8 pylint
+          # Критические ошибки: синтаксис, неопределённые имена
+          flake8 src tools tests --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Полный отчёт без блокировки сборки
+          flake8 src tools tests --count --exit-zero --max-line-length=100 --statistics
+          pylint src --exit-zero --max-line-length=100
+
+      - name: Сохранение отчёта об инспектировании
+        uses: actions/upload-artifact@v4
+        with:
+          name: inspection-report
+          path: reports/inspection_ci.md
+
+  # ------------------------------------------------------------------
+  # 2. Автоматические тесты на поддерживаемых версиях Python
+  # ------------------------------------------------------------------
+  test:
+    name: Тесты (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ['3.10', '3.11', '3.12']
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    
-    - name: Run linting with flake8
-      run: |
-        pip install flake8
-        flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 src/ --count --exit-zero --max-complexity=10 --max-line-length=100 --statistics
-    
-    - name: Run linting with pylint
-      run: |
-        pip install pylint
-        pylint src/ --exit-zero --max-line-length=100
-    
-    - name: Run unit tests with pytest
-      run: |
-        pip install pytest pytest-cov
-        pytest tests/ -v --cov=src --cov-report=xml --cov-report=html
-    
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        files: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: false
-  
+      - name: Получение исходного кода
+        uses: actions/checkout@v4
+
+      - name: Установка Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Зависимости (только стандартная библиотека)
+        run: python -c "import sys; print('Python', sys.version)"
+
+      - name: Автоматические тесты (встроенный запускающий модуль)
+        run: python -m tools.run_tests --summary reports/test_run_summary.md
+
+      - name: Тесты через pytest (при наличии пакета)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest pytest-cov
+          pytest tests/ -v --cov=src --cov-report=xml --cov-report=term
+
+      - name: Сохранение протокола испытаний
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-protocol-${{ matrix.python-version }}
+          path: reports/test_run_summary.md
+
+  # ------------------------------------------------------------------
+  # 3. Проверка соответствия реализации математической модели
+  # ------------------------------------------------------------------
+  models:
+    name: Математические модели
+    runs-on: ubuntu-latest
+    steps:
+      - name: Получение исходного кода
+        uses: actions/checkout@v4
+
+      - name: Установка Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Установка Pillow (для проверки вёрстки диаграмм)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install Pillow
+
+      - name: Генерация диаграмм и документов модели
+        run: |
+          python tools/make_diagrams.py
+          python tools/make_model_docs.py
+
+      - name: Проверка вёрстки диаграмм
+        run: python tools/render_diagrams.py
+
+      - name: Проверка отсутствия расхождений модели и реализации
+        run: python tools/make_model_docs.py --output reports
+
+      - name: Сохранение диаграмм
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagrams
+          path: diagrams/*.svg
+
+  # ------------------------------------------------------------------
+  # 4. Системная проверка: запуск приложения и сквозной сценарий
+  # ------------------------------------------------------------------
+  system:
+    name: Системная проверка приложения
+    runs-on: ubuntu-latest
+    steps:
+      - name: Получение исходного кода
+        uses: actions/checkout@v4
+
+      - name: Установка Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Инициализация базы данных
+        run: python run.py --init-db
+
+      - name: Запуск сервера приложения
+        run: |
+          python -m src --port 5000 &
+          echo $! > server.pid
+          ready=0
+          for attempt in $(seq 1 30); do
+            if python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/api/health')" 2>/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" -ne 1 ]; then
+            echo "Сервер не запустился за 30 секунд"
+            exit 1
+          fi
+          echo "Сервер запущен и отвечает на /api/health"
+
+      - name: Сквозной сценарий через REST API
+        run: python tools/smoke_test.py --base-url http://127.0.0.1:5000 --json reports/smoke_test_report.json
+
+      - name: Проверка структуры сформированных PDF-отчётов
+        run: python tools/verify_pdf.py reports
+
+      - name: Остановка сервера
+        if: always()
+        run: |
+          if [ -f server.pid ]; then kill "$(cat server.pid)" || true; fi
+
+      - name: Сохранение результатов проверки
+        uses: actions/upload-artifact@v4
+        with:
+          name: system-check
+          path: reports/
+
+  # ------------------------------------------------------------------
+  # 5. Анализ безопасности
+  # ------------------------------------------------------------------
   security:
+    name: Анализ безопасности
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    
-    - name: Run security checks with bandit
-      run: |
-        pip install bandit
-        bandit -r src/ -f json -o bandit-report.json || true
-    
-    - name: Run dependency check
-      run: |
-        pip install safety
-        safety check --json || true
-  
-  build:
+      - name: Получение исходного кода
+        uses: actions/checkout@v4
+
+      - name: Установка Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Статический анализ безопасности (bandit)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install bandit
+          bandit -r src tools -f json -o reports/bandit-report.json || true
+          bandit -r src tools -ll
+
+      - name: Проверка зависимостей (pip-audit)
+        run: |
+          python -m pip install pip-audit
+          if [ -f requirements.txt ]; then pip-audit -r requirements.txt || true; fi
+
+      - name: Сохранение отчёта по безопасности
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report
+          path: reports/bandit-report.json
+
+  # ------------------------------------------------------------------
+  # 6. Сборка отчётной документации
+  # ------------------------------------------------------------------
+  docs:
+    name: Сборка отчётной документации
     runs-on: ubuntu-latest
-    needs: [test, security]
-    
+    needs: [lint, test]
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    
-    - name: Initialize database
-      run: |
-        python -c "from src.core.database import init_db; init_db()"
-    
-    - name: Test application startup
-      run: |
-        timeout 10 python src/main.py || exit 0
-    
-    - name: Build documentation
-      run: |
-        pip install mkdocs mkdocs-material
-        echo "Documentation build placeholder"
+      - name: Получение исходного кода
+        uses: actions/checkout@v4
+
+      - name: Установка Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Установка библиотек для работы с документами
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install python-docx openpyxl Pillow
+
+      - name: Формирование протокола испытаний
+        run: python -m tools.run_tests -q --summary reports/test_run_summary.md
+
+      - name: Формирование снимков работы приложения
+        run: python tools/make_screenshots.py
+
+      - name: Сборка отчёта о практике
+        run: python tools/build_report.py --output reports/Отчёт_ПП02.docx
+
+      - name: Сохранение отчёта и материалов
+        uses: actions/upload-artifact@v4
+        with:
+          name: practice-report
+          path: |
+            reports/Отчёт_ПП02.docx
+            reports/test_run_summary.md
+            docs/screenshots/

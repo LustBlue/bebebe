@@ -1,17 +1,23 @@
+# Основные зависимости для запуска
 Flask==3.0.0
-Flask-SQLAlchemy==3.1.1
-Flask-JWT-Extended==4.6.0
 Flask-CORS==4.0.0
 python-dotenv==1.0.0
-SQLAlchemy==2.0.23
-PyJWT==2.8.0
 Werkzeug==3.0.1
+
+# Тестирование
 pytest==7.4.3
 pytest-cov==4.1.0
+
+# Линтеры и статический анализ
 pylint==3.0.3
 flake8==6.1.0
+
+# Экспорт отчётов (опционально)
 openpyxl==3.1.2
 reportlab==4.0.7
-psycopg2-binary==2.9.9
+
+# Утилиты
 python-dateutil==2.8.2
-email-validator==2.1.0
+
+# PostgreSQL (опционально, для production)
+# psycopg2-binary==2.9.9
