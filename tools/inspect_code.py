@@ -469,22 +469,38 @@ def inspect(targets: list[Path]) -> InspectionResult:
 def build_report(result: InspectionResult, fixed: dict[str, str] | None = None) -> str:
     """Сформировать отчёт об инспектировании в формате Markdown.
 
+    Все числа и состав замечаний берутся из результатов анализа, поэтому
+    отчёт не может разойтись с фактическим состоянием кода.
+
     :param result: результаты анализа
-    :param fixed: соответствие «правило:файл:строка» -> описание исправления
+    :param fixed: соответствие «правило:расположение» -> описание исправления
     """
     fixed = fixed or {}
     lines: list[str] = []
     lines.append("# Отчёт об инспектировании исходного кода ProjectFlow")
+    lines.append("")
+    lines.append("Документ сформирован автоматически анализатором "
+                 "`tools/inspect_code.py` по фактическому состоянию исходного "
+                 "кода проекта.")
     lines.append("")
     lines.append("## 1. Объём и методика проверки")
     lines.append("")
     lines.append(f"* Проанализировано файлов: **{result.files_checked}**")
     lines.append(f"* Проанализировано строк: **{result.lines_checked}**")
     lines.append(f"* Найдено замечаний: **{len(result.findings)}**")
+    lines.append(f"* Замечаний, требующих исправления: "
+                 f"**{len(result.open_findings())}**")
+    lines.append(f"* Согласованных отступлений с обоснованием: "
+                 f"**{len(result.accepted_findings())}**")
     lines.append("")
     lines.append("Анализ выполнен инструментом `tools/inspect_code.py`, который "
-                 "реализует правила flake8/pylint, применимые к проекту "
-                 "(см. конфигурации `.flake8` и `.pylintrc`).")
+                 "реализует правила flake8 и pylint, применимые к проекту "
+                 "(см. конфигурации `.flake8` и `.pylintrc`). Проверяются: "
+                 "длина строк, завершающие пробелы и символы перевода строки, "
+                 "именование классов, функций и аргументов, наличие "
+                 "docstring-комментариев, неиспользуемые импорты, обработка "
+                 "исключений, цикломатическая сложность, число аргументов "
+                 "функций и отсутствие секретов в коде.")
     lines.append("")
 
     lines.append("## 2. Сводка по правилам")
@@ -513,6 +529,8 @@ def build_report(result: InspectionResult, fixed: dict[str, str] | None = None) 
     }
     for rule, count in result.by_rule().items():
         lines.append(f"| `{rule}` | {count} | {meanings.get(rule, '—')} |")
+    if not result.by_rule():
+        lines.append("| — | 0 | замечаний не обнаружено |")
     lines.append("")
 
     lines.append("## 3. Распределение по критичности")
@@ -539,7 +557,9 @@ def build_report(result: InspectionResult, fixed: dict[str, str] | None = None) 
             lines.append(f"| `{rule}` | `{location}` | {message} | "
                          f"{severity_names.get(severity, severity)} | {resolution} |")
     else:
-        lines.append("Неустранённых замечаний не обнаружено.")
+        lines.append("Замечаний, требующих исправления в коде, не обнаружено. "
+                     "Все выявленные нарушения относятся к согласованным "
+                     "отступлениям, перечисленным в разделе 5.")
     lines.append("")
 
     lines.append("## 5. Согласованные отступления от правил")

@@ -246,6 +246,12 @@ jobs:
       - name: Сборка отчёта о практике
         run: python tools/build_report.py --output reports/Отчёт_ПП02.docx
 
+      - name: Проверка состава и оформления отчёта
+        run: python tools/verify_report.py --file reports/Отчёт_ПП02.docx
+
+      - name: Проверка конфигурации конвейера
+        run: python tools/verify_ci.py
+
       - name: Сохранение отчёта и материалов
         uses: actions/upload-artifact@v4
         with:

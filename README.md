@@ -96,6 +96,28 @@ python tools/smoke_test.py --base-url http://127.0.0.1:5000
 | `tools/make_model_docs.py` | матрица переходов, отчёт о соответствии модели | `python tools/make_model_docs.py` |
 | `tools/make_screenshots.py` | снимки работы приложения | `python tools/make_screenshots.py` |
 | `tools/build_report.py` | сборка отчёта о практике в DOCX | `python tools/build_report.py` |
+| `tools/verify_report.py` | проверка состава и оформления отчёта | `python tools/verify_report.py` |
+| `tools/verify_ci.py` | проверка конфигурации конвейера CI | `python tools/verify_ci.py` |
+| `tools/make_git_history.py` | формирование ветвления и истории коммитов | `python tools/make_git_history.py --dry-run` |
+
+## Проверка проекта целиком
+
+Команды выполняются из корневого каталога проекта и не требуют внешних
+библиотек (кроме сборки отчёта, которой нужен `python-docx`):
+
+```bash
+python -m tools.run_tests                          # автоматические тесты
+python tools/inspect_code.py                       # статический анализ кода
+python tools/make_model_docs.py                    # модель и реализация
+python tools/render_diagrams.py                    # вёрстка диаграмм
+python tools/verify_ci.py                          # конфигурация CI
+python tools/build_report.py                       # сборка отчёта
+python tools/verify_report.py                      # состав и оформление отчёта
+```
+
+Все команды должны завершаться успешно (код возврата 0). Такой же набор
+проверок выполняется в конвейере GitHub Actions
+([.github/workflows/ci.yml](.github/workflows/ci.yml)).
 
 ## Структура репозитория
 
